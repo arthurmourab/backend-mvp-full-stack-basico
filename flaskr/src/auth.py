@@ -1,7 +1,8 @@
 from flask import request, jsonify, session
 from flask_restx import Namespace, Resource, fields
 from werkzeug.security import generate_password_hash, check_password_hash
-from flaskr.db import get_db
+from flaskr.models import User
+from flaskr import db
 
 api = Namespace('auth', description='Operações de autenticação')
 
@@ -33,19 +34,23 @@ class Register(Resource):
         email = data.get('email')
         password = data.get('password')
 
-        db = get_db()
-
         if not username or not name or not last_name or not email or not password:
             return {'error': 'Todos os campos são obrigatórios.'}, 400
 
-        try:
-            db.execute(
-                "INSERT INTO users (username, name, last_name, email, password) VALUES (?, ?, ?, ?, ?)",
-                (username, name, last_name, email, generate_password_hash(password)),
-            )
-            db.commit()
-        except db.IntegrityError as e:
-            return {'error': 'Usuário já existe.'}, 400
+        if User.query.filter((User.username == username) | (User.email == email)).first():
+            return {'error': 'Usuário com esse username ou email já existe.'}, 400
+
+        hashed_password = generate_password_hash(password)
+        new_user = User(
+            username=username,
+            name=name,
+            last_name=last_name,
+            email=email,
+            password=hashed_password
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
 
         return {'message': 'Usuário registrado com sucesso'}, 201
 
@@ -61,16 +66,15 @@ class Login(Resource):
         email = data.get('email')
         password = data.get('password')
 
-        db = get_db()
-        user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+        user = User.query.filter_by(email=email).first()
 
-        if user is None or not check_password_hash(user['password'], password):
+        if not user or not check_password_hash(user.password, password):
             return {'error': 'Credenciais inválidas'}, 401
 
         session.clear()
-        session['user_id'] = user['id']
+        session['user_id'] = user.id
 
-        return {'message': 'Login bem-sucedido', 'user_id': user['id']}, 200
+        return {'message': 'Login bem-sucedido', 'user_id': user.id}, 200
 
 
 @api.route('/logout')
