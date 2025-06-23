@@ -75,11 +75,3 @@ class Login(Resource):
         session['user_id'] = user.id
 
         return {'message': 'Login bem-sucedido', 'user_id': user.id}, 200
-
-
-@api.route('/logout')
-class Logout(Resource):
-    @api.response(200, 'Logout realizado com sucesso')
-    def post(self):
-        session.clear()
-        return {'message': 'Logout realizado com sucesso'}, 200
