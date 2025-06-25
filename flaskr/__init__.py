@@ -1,7 +1,7 @@
 import os
 from flask import Flask
-from flask_restx import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 # Criação global do SQLAlchemy
 db = SQLAlchemy()
@@ -34,7 +34,12 @@ def create_app(test_config=None):
 
     # Importar namespaces, blueprints e rotas **aqui dentro**, após criar app e inicializar db
     from flaskr.src.auth import api as auth_api
+    from flaskr.src.movies import api as movies_api
+    from flaskr.src.reviews import api as reviews_api
+    from flaskr.src.watched import api as watched_api
+
     from flask_restx import Api
+    from .seed import seed_db
 
     # Inicializa o Swagger (Flask-RESTX)
     api = Api(
@@ -47,5 +52,11 @@ def create_app(test_config=None):
 
     # Registra os namespaces (rotas organizadas)
     api.add_namespace(auth_api, path='/auth')
+    api.add_namespace(movies_api, path='/movies')
+    api.add_namespace(reviews_api, path='/reviwes')
+    api.add_namespace(watched_api, path='/watched')
 
+    CORS(app, supports_credentials=True)
+
+    app.cli.add_command(seed_db)
     return app
