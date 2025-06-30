@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flaskr.models import db, Movie, WatchedMovie
+from flaskr.models import db, Movie, WatchedMovie, Review
 from sqlalchemy import func
 
 api = Namespace('movies', description='Operações relacionadas a filmes')
@@ -10,8 +10,7 @@ movie_summary = api.model('MovieSummary', {
     'name': fields.String,
     'genre': fields.String,
     'year': fields.Integer,
-    'cover': fields.String,
-    'views': fields.Integer(description="Quantidade de vezes que foi assistido")
+    'cover': fields.String
 })
 
 # Modelo para resposta detalhada (um filme)
@@ -35,7 +34,7 @@ class MovieList(Resource):
         movies = (
             db.session.query(
                 Movie,
-                func.count(WatchedMovie.id).label('views')
+                func.count(WatchedMovie.id).label('views'),
             )
             .outerjoin(WatchedMovie, WatchedMovie.movie_id == Movie.id)
             .group_by(Movie.id)
@@ -52,13 +51,10 @@ class MovieList(Resource):
                 'genre': movie.genre,
                 'year': movie.year,
                 'cover': movie.cover,
-                'views': views
             })
+
+        print(result)
         return result
-
-
-from flaskr.models import Movie, WatchedMovie, Review
-from sqlalchemy import func
 
 @api.route('/<int:id>')
 @api.param('id', 'ID do filme')
