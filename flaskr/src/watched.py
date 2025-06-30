@@ -29,23 +29,9 @@ class Watched(Resource):
         # Verifica se já assistiu
         existing = WatchedMovie.query.filter_by(user_id=user_id, movie_id=movie_id).first()
         if existing:
-            return {'message': 'Filme já estava marcado como assistido'}, 200
+            return {'message': 'Filme já assitido. Você não pode marcar o mesmo filme mais de uma vez'}, 200
 
         watched = WatchedMovie(user_id=user_id, movie_id=movie_id, date=datetime.utcnow())
         db.session.add(watched)
         db.session.commit()
         return {'message': 'Filme marcado como assistido'}, 201
-
-
-@api.route('/check')
-class WatchedCheck(Resource):
-    def get(self):
-        """Verifica se o usuário assistiu ao filme"""
-        user_id = request.args.get('user_id')
-        movie_id = request.args.get('movie_id')
-
-        if not user_id or not movie_id:
-            return {'error': 'Parâmetros obrigatórios'}, 400
-
-        watched = WatchedMovie.query.filter_by(user_id=user_id, movie_id=movie_id).first()
-        return {'watched': watched is not None}
