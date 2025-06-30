@@ -3,6 +3,7 @@ from flask_restx import Namespace, Resource, fields
 from werkzeug.security import generate_password_hash, check_password_hash
 from flaskr.models import User
 from flaskr import db
+from sqlalchemy.exc import IntegrityError
 
 api = Namespace('auth', description='Operações de autenticação')
 
@@ -50,8 +51,12 @@ class Register(Resource):
         )
 
         db.session.add(new_user)
-        db.session.commit()
 
+        try:
+            db.session.commit();
+        except IntegrityError:
+            db.session.rollback()
+            return {'error': 'Erro ao criar usuário'}, 400
         return {'message': 'Usuário registrado com sucesso'}, 201
 
 
@@ -75,3 +80,5 @@ class Login(Resource):
         session['user_id'] = user.id
 
         return {'message': 'Login bem-sucedido', 'user_id': user.id}, 200
+
+
