@@ -1,6 +1,6 @@
 from flask import request, session
 from flask_restx import Namespace, Resource, fields
-from flaskr.models import db, Review
+from flaskr.models import db, Review, WatchedMovie
 from sqlalchemy.exc import IntegrityError
 
 api = Namespace('reviews', description='Avaliações de filmes')
@@ -31,23 +31,25 @@ class ReviewResource(Resource):
         if rating is None or not (0 <= rating <= 10):
             return {'error': 'Nota deve estar entre 0 e 10'}, 400
 
-        review = Review.query.filter_by(author_id=user_id, movie_id=movie_id).first()
+        # Verifica se já assistiu
+        existing = WatchedMovie.query.filter_by(user_id=user_id, movie_id=movie_id).first()
+        if not existing:
+            return {'message': 'Filme ainda não assistido. Você precisa assistir o filme para poder avaliar'}, 200
 
-        if review:
-            # Atualiza
-            review.title = data.get('title')
-            review.content = data.get('content')
-            review.rating = rating
-        else:
+        # Verifica se já avaliou
+        existingReview = Review.query.filter_by(author_id=user_id, movie_id=movie_id).first()
+        if existingReview:
+            return {'message': 'Filme já avaliado. Você não pode avaliar o mesmo filme mais de uma vez'}, 200
+
             # Cria nova
-            review = Review(
-                title=data.get('title'),
-                content=data.get('content'),
-                rating=rating,
-                movie_id=movie_id,
-                author_id=user_id
-            )
-            db.session.add(review)
+        new_review = Review(
+            title=data.get('title'),
+            content=data.get('content'),
+            rating=rating,
+            movie_id=movie_id,
+            author_id=user_id
+        )
+        db.session.add(new_review)
 
         try:
             db.session.commit()
@@ -57,15 +59,3 @@ class ReviewResource(Resource):
 
         return {'message': 'Avaliação salva com sucesso'}, 201
 
-@api.route('/check')
-class ReviewCheck(Resource):
-    def get(self):
-        """Verifica se o usuário já avaliou o filme"""
-        user_id = request.args.get('user_id')
-        movie_id = request.args.get('movie_id')
-
-        if not user_id or not movie_id:
-            return {'error': 'Parâmetros obrigatórios'}, 400
-
-        existing = Review.query.filter_by(author_id=user_id, movie_id=movie_id).first()
-        return {'exists': existing is not None}
