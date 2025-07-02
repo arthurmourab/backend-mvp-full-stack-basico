@@ -19,7 +19,7 @@ class ReviewResource(Resource):
     @api.response(201, 'Avaliação salva')
     @api.response(400, 'Erro na avaliação')
     def post(self):
-        """Cria ou atualiza a avaliação de um filme"""
+        """Cria uma avaliação de um filme"""
         user_id = session.get('user_id')
         if not user_id:
             return {'error': 'Usuário não autenticado'}, 400
@@ -41,7 +41,7 @@ class ReviewResource(Resource):
         if existingReview:
             return {'message': 'Filme já avaliado. Você não pode avaliar o mesmo filme mais de uma vez'}, 200
 
-            # Cria nova
+        # Cria nova
         new_review = Review(
             title=data.get('title'),
             content=data.get('content'),

@@ -53,7 +53,7 @@ def create_app(test_config=None):
     # Registra os namespaces (rotas organizadas)
     api.add_namespace(auth_api, path='/auth')
     api.add_namespace(movies_api, path='/movies')
-    api.add_namespace(reviews_api, path='/reviwes')
+    api.add_namespace(reviews_api, path='/reviews')
     api.add_namespace(watched_api, path='/watched')
 
     CORS(app, supports_credentials=True)
