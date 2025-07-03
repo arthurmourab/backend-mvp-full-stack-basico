@@ -2,8 +2,6 @@
 
 MovieEnjoyer é uma aplicação web desenvolvida com Flask (backend) e HTML/CSS/JavaScript puro (frontend), que permite que usuários se cadastrem, façam login, visualizem os filmes mais assistidos, marquem filmes como assistidos e deixem suas avaliações.
 
-O frontend é o mais próximo possível de uma SPA (Single Page Application) com uma interface visual original e funcional, capaz de rodar diretamente via `index.html` sem necessidade de servidores adicionais.
-
 ---
 
 ## 🚀 Funcionalidades
@@ -31,11 +29,53 @@ O frontend é o mais próximo possível de uma SPA (Single Page Application) com
 ### 🔁 1. Clone o repositório
 ```bash
 git clone https://github.com/arthurmourab/backend-mvp-full-stack-basico.git
-cd zencall
 ```
 
-### 🐍 2. Criar e ativar um ambiente virtual
+### 🐍 2. Crie e ative um ambiente virtual
 #### Windows:
+Criar a pasta .venv na raíz do repositório
+```bash
+py -3 -m venv .venv
+```
+
+Ative o ambiente virtual criado
+```bash
+.venv\Scripts\activate
+```
+<br />
+
+#### macOS/Linux:
+```bash
+python3 -m venv .venv
+```
+
+```bash
+ . .venv/bin/activate
+```
+
+### 📦 3. Instale as dependências
+```bash
+pip install -r requirements.txt
+```
+
+### ▶ 4. Popule o banco e execute a aplicação
+#### Popule o banco com o arquivo seed.py
+```bash
+flask --app flaskr seed-db
+```
+<br />
+
+#### Pronto, agora é só executar a aplicação!
+```bash
+flask --app flaskr run
+```
+
+ou 
+```bash
+flask --app flaskr run --debug
+```
+para executar no modo de debug
+
 
 
 
