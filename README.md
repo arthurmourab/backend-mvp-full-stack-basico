@@ -76,9 +76,5 @@ flask --app flaskr run --debug
 ```
 para executar no modo de debug
 
-
-
-
-
-
-
+### 🔍 5. Teste com swagger
+Acesse <http://127.0.0.1:5000/swagger> para ter acesso à documentação e conseguir testar a aplicação
