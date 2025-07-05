@@ -13,6 +13,7 @@ watched_model = api.model('Watched', {
 class Watched(Resource):
     @api.expect(watched_model)
     @api.response(201, 'Filme marcado como assistido')
+    @api.response(200, 'Filme já assistido')
     @api.response(400, 'Requisição inválida')
     def post(self):
         """Marca um filme como assistido"""

@@ -17,6 +17,7 @@ review_model = api.model('Review', {
 class ReviewResource(Resource):
     @api.expect(review_model)
     @api.response(201, 'Avaliação salva')
+    @api.response(200, 'Filme já avaliado')
     @api.response(400, 'Erro na avaliação')
     def post(self):
         """Cria uma avaliação de um filme"""
